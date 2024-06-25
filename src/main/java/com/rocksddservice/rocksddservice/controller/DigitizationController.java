@@ -2,8 +2,7 @@ package com.rocksddservice.rocksddservice.controller;
 
 import com.lowagie.text.DocumentException;
 import com.rocksddservice.rocksddservice.service.*;
-import com.rocksddservice.rocksddservice.solution.DocumentConversionService;
-import com.rocksddservice.rocksddservice.solution.DocumentConversionServiceFolder;
+import com.rocksddservice.rocksddservice.solution.IDocumentConversionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -27,10 +26,7 @@ public class DigitizationController {
     private ConvertDocument convertDocument;
 
     @Autowired
-    private DocumentConversionService documentConversionService;
-
-    @Autowired
-    private DocumentConversionServiceFolder documentConversionServiceFolder;
+    private IDocumentConversionService iDocumentConversionService;
 
     @GetMapping("/create-word-doc")
     public String createWordDocument(@RequestParam String fileNameWithPath) {
@@ -113,31 +109,21 @@ public class DigitizationController {
         return "Conversion completed!";
     }
 
-    @PostMapping("/convertToPDF1")
-    public ResponseEntity<String> convertToPDF(@RequestParam String docPath, @RequestParam String pdfPath) {
+    @PostMapping("/convertToPDFBatchMode")
+    public ResponseEntity<String> convertToPDFBatchMode(@RequestParam String sourcePath, @RequestParam String targetPath) {
         try {
-            documentConversionService.convertToPDF(docPath, pdfPath);
-            return ResponseEntity.ok("Conversion completed successfully!");
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Conversion failed: " + e.getMessage());
-        }
-    }
-
-    @PostMapping("/convertFolder")
-    public ResponseEntity<String> convertFolder(@RequestParam String inputFolderPath, @RequestParam String outputFolderPath) {
-        try {
-            documentConversionServiceFolder.convertFolderToPDF(inputFolderPath, outputFolderPath);
+            iDocumentConversionService.convertToPDFBatchMode(sourcePath, targetPath);
             return ResponseEntity.ok("Batch conversion completed successfully!");
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Batch conversion failed: " + e.getMessage());
         }
     }
 
-    @PostMapping("/convertDocument")
-    public ResponseEntity<String> convertDocument(@RequestParam String inputFolderPath, @RequestParam String outputFolderPath) {
+    @PostMapping("/convertToPDFSingleMode")
+    public ResponseEntity<String> convertToPDFSingleMode(@RequestParam String sourcePath, @RequestParam String targetPath) {
         try {
-            documentConversionServiceFolder.convertDocument(inputFolderPath, outputFolderPath);
-            return ResponseEntity.ok("Batch conversion completed successfully!");
+            iDocumentConversionService.convertToPDFSingleMode(sourcePath, targetPath);
+            return ResponseEntity.ok("File conversion completed successfully!");
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Batch conversion failed: " + e.getMessage());
         }
